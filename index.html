@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0a14">
+    <meta name="description" content="Neon Horde: Survivor — Cyberpunk auto-shooter hayatta kalma oyunu">
+    <title>Neon Horde: Survivor</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Game Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD Overlay -->
+    <div id="hud">
+        <!-- XP Bar (top full width) -->
+        <div id="xp-bar-container">
+            <div id="xp-bar-fill"></div>
+            <span id="xp-text">0 / 10</span>
+        </div>
+
+        <!-- Top Left: HP + Level -->
+        <div id="hud-top-left">
+            <div id="level-text">LV 1</div>
+            <div id="hp-bar-container">
+                <div id="hp-bar-fill"></div>
+                <span id="hp-text">100 / 100</span>
+            </div>
+        </div>
+
+        <!-- Top Right: Timer + Kills + Gold -->
+        <div id="hud-top-right">
+            <div id="timer-text">00:00</div>
+            <div id="kills-text">💀 0</div>
+            <div id="gold-text">💰 0</div>
+            <div id="fps-text">FPS -- | E --</div>
+        </div>
+
+        <!-- Bottom Left: Weapon Icons -->
+        <div id="weapon-icons"></div>
+
+        <!-- Bottom Right: Mute + Pause -->
+        <div id="hud-bottom-right">
+            <button id="dash-btn">🌀</button>
+            <button id="pause-btn">⏸️</button>
+            <button id="mute-btn">🔊</button>
+        </div>
+
+        <!-- Boss Warning Banner -->
+        <div id="boss-warning"></div>
+
+        <!-- Boss HP Bar -->
+        <div id="boss-hp-container">
+            <span id="boss-name">BOSS</span>
+            <div id="boss-hp-bar">
+                <div id="boss-hp-fill"></div>
+            </div>
+        </div>
+
+        <!-- Level System HUD -->
+        <div id="level-hud" style="display:none;">
+            <span class="level-hud-level">⚔️ SEVİYE 1</span>
+            <span class="level-hud-remain">💀 0 / 50</span>
+            <div class="level-hud-bar"><div class="level-hud-bar-fill"></div></div>
+        </div>
+
+        <!-- Active Powerup Timers -->
+        <div id="powerup-timers"></div>
+
+        <!-- First-run tutorial overlay -->
+        <div id="tutorial-overlay"></div>
+    </div>
+
+    <!-- Level Complete Overlay -->
+    <div id="level-complete-overlay"></div>
+
+    <!-- ======== SCREENS ======== -->
+
+    <!-- Main Menu -->
+    <div id="menu-screen" class="screen visible">
+        <div class="menu-content">
+            <h1 class="game-title">
+                <span class="title-neon">NEON</span>
+                <span class="title-horde">HORDE</span>
+            </h1>
+            <p class="game-subtitle">S U R V I V O R</p>
+            <div class="menu-stats">
+                <span id="menu-gold">💰 0</span>
+                <span id="menu-highscore"></span>
+            </div>
+            <button id="start-btn" class="neon-btn">
+                <span>OYUNA BAŞLA</span>
+            </button>
+            <div class="menu-secondary-btns">
+                <button id="quest-btn" class="neon-btn quest-menu-btn">
+                    <span>📋 GÖREVLER</span>
+                </button>
+                <button id="shop-btn" class="neon-btn shop-menu-btn">
+                    <span>🏪 MAĞAZA</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quest / Achievement Panel (overlay on menu) -->
+        <div id="quest-panel" class="quest-panel">
+            <div class="quest-panel-content">
+                <h2 class="quest-panel-title">📋 GÖREVLER & BAŞARIMLAR</h2>
+                <div id="quest-panel-body"></div>
+                <button id="quest-panel-close" class="neon-btn end-btn">
+                    <span>← KAPAT</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Select -->
+    <div id="charselect-screen" class="screen">
+        <div class="charselect-content">
+            <h2 class="charselect-title">KARAKTER SEÇ</h2>
+            <p class="charselect-subtitle">Hayatta kalma tarzını belirle</p>
+            <div id="char-grid"></div>
+            <button id="char-start-btn" class="neon-btn">
+                <span>▶ BAŞLA</span>
+            </button>
+            <button id="char-back-btn" class="neon-btn end-btn">
+                <span>← GERİ</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Map Select -->
+    <div id="mapselect-screen" class="screen">
+        <div class="mapselect-content">
+            <h2 class="mapselect-title">🗺️ HARİTA SEÇ</h2>
+            <p class="mapselect-subtitle">Nereye düşmek istersin?</p>
+            <div id="map-grid"></div>
+            <button id="map-start-btn" class="neon-btn">
+                <span>▶ BAŞLA</span>
+            </button>
+            <button id="map-back-btn" class="neon-btn end-btn">
+                <span>← GERİ</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Pause Screen -->
+    <div id="pause-screen" class="screen">
+        <div class="pause-content">
+            <h2 class="pause-title">DURDURULDU</h2>
+            <div class="pause-settings">
+                <button id="quality-toggle-btn" class="neon-btn postfx-toggle-btn">
+                    <span>QUALITY: HIGH</span>
+                </button>
+                <button id="bloom-toggle-btn" class="neon-btn postfx-toggle-btn">
+                    <span>BLOOM: AÇIK</span>
+                </button>
+                <button id="crt-toggle-btn" class="neon-btn postfx-toggle-btn">
+                    <span>CRT: AÇIK</span>
+                </button>
+                <button id="chromatic-toggle-btn" class="neon-btn postfx-toggle-btn">
+                    <span>CHROMATIC: AÇIK</span>
+                </button>
+                <button id="contrast-toggle-btn" class="neon-btn postfx-toggle-btn">
+                    <span>KONTRAST: NORMAL</span>
+                </button>
+                <button id="hudsize-toggle-btn" class="neon-btn postfx-toggle-btn">
+                    <span>HUD BOYUT: NORMAL</span>
+                </button>
+            </div>
+            <div class="pause-buttons">
+                <button id="resume-btn" class="neon-btn">
+                    <span>▶️ DEVAM ET</span>
+                </button>
+                <button id="pause-menu-btn" class="neon-btn end-btn">
+                    <span>🏠 ANA MENÜ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level Up -->
+    <div id="levelup-screen" class="screen">
+        <h2 class="levelup-title">SEVİYE ATLADIN!</h2>
+        <p class="levelup-subtitle">Bir yükseltme seç</p>
+        <div id="card-container"></div>
+    </div>
+
+    <!-- Game Over -->
+    <div id="gameover-screen" class="screen">
+        <div class="gameover-content">
+            <h2 class="gameover-title">GAME OVER</h2>
+            <div class="gameover-buttons">
+                <button id="go-revive-btn" class="neon-btn revive-btn">
+                    <span>❤️ Diril (%50 HP)</span>
+                </button>
+                <button id="go-end-btn" class="neon-btn end-btn">
+                    <span>Bitir</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results-screen" class="screen">
+        <div class="results-content">
+            <h2 class="results-title">SONUÇLAR</h2>
+            <div class="results-stats">
+                <div class="result-row">
+                    <span>⏱️ Süre</span>
+                    <span id="result-time">0m 0s</span>
+                </div>
+                <div class="result-row">
+                    <span>💀 Öldürme</span>
+                    <span id="result-kills">0</span>
+                </div>
+                <div class="result-row gold-row">
+                    <span>💰 Kazanılan Altın</span>
+                    <span id="result-gold">0</span>
+                </div>
+                <div class="result-row">
+                    <span>🏦 Toplam Altın</span>
+                    <span id="result-total-gold">0</span>
+                </div>
+            </div>
+            <div id="result-meta" class="results-meta"></div>
+            <button id="double-gold-btn" class="neon-btn gold-btn">
+                <span>💰 Altınları 2x Katla</span>
+            </button>
+            <button id="result-restart-btn" class="neon-btn">
+                <span>YENİDEN OYNA</span>
+            </button>
+            <button id="result-menu-btn" class="neon-btn end-btn">
+                <span>🏠 ANA MENÜ</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Simulated Ad Screen -->
+    <div id="ad-screen" class="screen">
+        <div class="ad-content">
+            <div class="ad-placeholder">
+                <div class="ad-icon">📺</div>
+                <p>Reklam Simülasyonu</p>
+                <div class="ad-countdown">3</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shop Screen -->
+    <div id="shop-screen" class="screen">
+        <div class="shop-content">
+            <h2 class="shop-title">🏪 MAĞAZA</h2>
+            <p class="shop-gold-display">💰 <span id="shop-gold">0</span></p>
+            <div class="shop-tabs" role="tablist" aria-label="Mağaza sekmeleri">
+                <button id="shop-tab-upgrades" class="shop-tab-btn active" data-tab="upgrades" role="tab" aria-selected="true">
+                    <span>YÜKSELTMELER</span>
+                </button>
+                <button id="shop-tab-characters" class="shop-tab-btn" data-tab="characters" role="tab" aria-selected="false">
+                    <span>KARAKTER</span>
+                </button>
+                <button id="shop-tab-maps" class="shop-tab-btn" data-tab="maps" role="tab" aria-selected="false">
+                    <span>HARİTA</span>
+                </button>
+            </div>
+
+            <div id="shop-panel-upgrades" class="shop-panel visible" data-panel="upgrades">
+                <div id="shop-grid"></div>
+            </div>
+
+            <div id="shop-panel-characters" class="shop-panel" data-panel="characters">
+                <div id="shop-char-grid"></div>
+            </div>
+
+            <div id="shop-panel-maps" class="shop-panel" data-panel="maps">
+                <div id="shop-map-grid"></div>
+            </div>
+
+            <button id="shop-back-btn" class="neon-btn">
+                <span>← GERİ</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts (order matters!) -->
+    <script src="js/pool.js"></script>
+    <script src="js/characters.js"></script>
+    <script src="js/maps.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/particles.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemy.js"></script>
+    <script src="js/enemy_types.js"></script>
+    <script src="js/enemy_sprites.js"></script>
+    <script src="js/enemy_bullets.js"></script>
+    <script src="js/weapons.js"></script>
+    <script src="js/xp.js"></script>
+    <script src="js/economy.js?v=2"></script>
+    <script src="js/level_system.js?v=3"></script>
+    <script src="js/ui.js?v=2"></script>
+    <script src="js/main.js"></script>
+
+    <!-- Extended enemy & UI systems (additive, no originals modified) -->
+    <script src="js/enemy_types_extended.js"></script>
+    <script src="js/boss_system.js"></script>
+    <script src="js/enemy_behaviors.js"></script>
+    <script src="js/ui_enhanced.js"></script>
+    <script src="js/game_feel.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.getRegistrations()
+                    .then((regs) => Promise.all(regs.map((r) => r.unregister())))
+                    .catch(() => { });
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "Neon Horde: Survivor",
+  "short_name": "Neon Horde",
+  "description": "Cyberpunk temalı auto-shooter hayatta kalma oyunu.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0a14",
+  "theme_color": "#0a0a14",
+  "lang": "tr",
+  "categories": ["games", "action", "arcade"],
+  "icons": []
+}

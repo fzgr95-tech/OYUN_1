@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Neon Horde — Otomatik QA Test</title>
+<style>
+body { background:#111; color:#0f0; font-family:monospace; padding:20px; }
+h1 { color:#0ff; }
+.pass { color:#0f0; } .fail { color:#f00; } .warn { color:#ff0; }
+#log { white-space:pre-wrap; line-height:1.6; }
+</style>
+</head>
+<body>
+<h1>🧪 Neon Horde: Otomatik QA Test Runner</h1>
+<div id="log"></div>
+
+<!-- Load all game scripts in order -->
+<canvas id="gameCanvas" width="800" height="600" style="display:none"></canvas>
+
+<!-- Minimal HTML stubs so UI.init doesn't crash -->
+<div id="menu-screen" class="screen"></div>
+<div id="game-title"></div>
+<div id="menu-gold"></div>
+<div id="menu-best"></div>
+<div id="play-btn"></div>
+<div id="shop-btn"></div>
+<div id="meta-summary"></div>
+<div id="char-select-screen" class="screen"></div>
+<div id="char-grid"></div>
+<div id="char-start-btn"></div>
+<div id="char-back-btn"></div>
+<div id="map-select-screen" class="screen"></div>
+<div id="map-grid"></div>
+<div id="map-start-btn"></div>
+<div id="map-back-btn"></div>
+<div id="hud" class="screen"></div>
+<div id="hud-hp-bar"></div>
+<div id="hud-hp-text"></div>
+<div id="hud-xp-bar"></div>
+<div id="hud-xp-text"></div>
+<div id="hud-level"></div>
+<div id="hud-time"></div>
+<div id="hud-kills"></div>
+<div id="hud-gold"></div>
+<div id="hud-fps"></div>
+<div id="hud-enemy-count"></div>
+<div id="hud-weapon-icons"></div>
+<div id="hud-powerup-timers"></div>
+<div id="pause-btn"></div>
+<div id="mute-btn"></div>
+<div id="boss-hp-container"></div>
+<div id="boss-hp-bar"></div>
+<div id="boss-hp-text"></div>
+<div id="pause-screen" class="screen"></div>
+<div id="resume-btn"></div>
+<div id="pause-menu-btn"></div>
+<div id="quality-toggle-btn"></div>
+<div id="bloom-toggle-btn"></div>
+<div id="crt-toggle-btn"></div>
+<div id="chromatic-toggle-btn"></div>
+<div id="contrast-toggle-btn"></div>
+<div id="hudsize-toggle-btn"></div>
+<div id="levelup-screen" class="screen"></div>
+<div id="levelup-options"></div>
+<div id="gameover-screen" class="screen"></div>
+<div id="go-revive-btn"></div>
+<div id="go-end-btn"></div>
+<div id="results-screen" class="screen"></div>
+<div id="result-time"></div>
+<div id="result-kills"></div>
+<div id="result-gold"></div>
+<div id="result-total-gold"></div>
+<div id="double-gold-btn"></div>
+<div id="result-restart-btn"></div>
+<div id="result-menu-btn"></div>
+<div id="result-meta"></div>
+<div id="ad-overlay"></div>
+<div id="ad-timer"></div>
+<div id="shop-screen" class="screen"></div>
+<div id="shop-gold"></div>
+<div id="shop-grid"></div>
+<div id="shop-back-btn"></div>
+<div id="tutorial-overlay"></div>
+<div id="combo-display"></div>
+
+<script src="js/pool.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/input.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/characters.js"></script>
+<script src="js/maps.js"></script>
+<script src="js/economy.js"></script>
+<script src="js/player.js"></script>
+<script src="js/xp.js"></script>
+<script src="js/enemy.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+
+<script>
+const logEl = document.getElementById('log');
+let passCount = 0, failCount = 0;
+
+function log(msg, cls) {
+    const line = document.createElement('div');
+    line.className = cls || '';
+    line.textContent = msg;
+    logEl.appendChild(line);
+}
+
+function assert(condition, label) {
+    if (condition) {
+        passCount++;
+        log(`  ✅ PASS: ${label}`, 'pass');
+    } else {
+        failCount++;
+        log(`  ❌ FAIL: ${label}`, 'fail');
+    }
+}
+
+function hasClass(id, cls) {
+    const el = document.getElementById(id);
+    return el && el.classList.contains(cls);
+}
+
+function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+}
+
+async function runTests() {
+    log('═══════════════════════════════════════');
+    log('  NEON HORDE — AUTOMATED QA SUITE');
+    log('═══════════════════════════════════════\n');
+
+    // ── TEST 1: Initialization ──
+    log('── TEST 1: Game Initialization ──');
+    try {
+        // Game.init() is already called on window load
+        await sleep(500);
+        assert(typeof Game === 'object', 'Game object exists');
+        assert(typeof UI === 'object', 'UI object exists');
+        assert(typeof Economy === 'object', 'Economy object exists');
+        assert(typeof Player === 'object', 'Player object exists');
+        assert(typeof Enemies === 'object', 'Enemies object exists');
+        assert(typeof Weapons === 'object', 'Weapons object exists');
+        assert(typeof Renderer === 'object', 'Renderer object exists');
+        assert(typeof Audio === 'object', 'Audio object exists');
+        assert(Game.state === 'MENU', `Initial state is MENU (got: ${Game.state})`);
+    } catch(e) { log(`  ⚠ INIT ERROR: ${e.message}`, 'fail'); }
+
+    // ── TEST 2: Start Game Flow ──
+    log('\n── TEST 2: Start Game ──');
+    try {
+        Game.startGame();
+        await sleep(200);
+        assert(Game.state === 'PLAYING', `State changed to PLAYING (got: ${Game.state})`);
+        assert(Game.gameTime === 0, 'Game time starts at 0');
+        assert(Game.kills === 0, 'Kills counter starts at 0');
+        assert(Player.hp > 0, `Player HP > 0 (HP: ${Player.hp})`);
+        assert(Player.maxHp > 0, `Player maxHp > 0 (maxHp: ${Player.maxHp})`);
+        assert(hasClass('hud', 'visible'), 'HUD is visible');
+    } catch(e) { log(`  ⚠ START ERROR: ${e.message}`, 'fail'); }
+
+    // ── TEST 3: Pause/Resume ──
+    log('\n── TEST 3: Pause/Resume ──');
+    try {
+        Game.pauseGame();
+        assert(Game.state === 'PAUSED', `State changed to PAUSED (got: ${Game.state})`);
+        assert(hasClass('pause-screen', 'visible'), 'Pause screen is visible');
+        
+        Game.resumeGame();
+        await sleep(100);
+        assert(Game.state === 'PLAYING', `State returned to PLAYING (got: ${Game.state})`);
+        assert(!hasClass('pause-screen', 'visible'), 'Pause screen is hidden');
+    } catch(e) { log(`  ⚠ PAUSE ERROR: ${e.message}`, 'fail'); }
+
+    // ── TEST 4: Death → Game Over → Results → Menu (CRITICAL) ──
+    log('\n── TEST 4: Death → Game Over → Results → Menu (ITEM 4) ──');
+    try {
+        // Simulate some kills first
+        Game.kills = 5;
+        Game.gameTime = 30;
+        
+        // Kill the player
+        Player.hp = 0;
+        Game.gameOver();
+        await sleep(200);
+        
+        assert(Game.state === 'GAMEOVER', `State is GAMEOVER (got: ${Game.state})`);
+        assert(hasClass('gameover-screen', 'visible'), 'Game over screen is visible');
+        
+        // Click "Bitir" → Results
+        UI.hideGameOver();
+        Game.showResults();
+        await sleep(200);
+        
+        assert(Game.state === 'RESULTS', `State is RESULTS (got: ${Game.state})`);
+        assert(hasClass('results-screen', 'visible'), 'Results screen is visible');
+        assert(!hasClass('gameover-screen', 'visible'), 'Game over screen is hidden');
+        
+        // Click "Ana Menü" from results
+        Game.returnToMenu();
+        await sleep(200);
+        
+        assert(Game.state === 'MENU', `State returned to MENU (got: ${Game.state})`);
+        assert(hasClass('menu-screen', 'visible'), 'Menu screen is visible');
+        assert(!hasClass('results-screen', 'visible'), 'Results screen is hidden');
+        assert(!hasClass('gameover-screen', 'visible'), 'Game over screen is hidden');
+        assert(!hasClass('hud', 'visible'), 'HUD is hidden');
+    } catch(e) { log(`  ⚠ FLOW ERROR: ${e.message}`, 'fail'); }
+
+    // ── TEST 5: Restart from Results ──
+    log('\n── TEST 5: Restart from Results ──');
+    try {
+        // Start a new game, die, go to results, then restart
+        Game.startGame();
+        await sleep(200);
+        Game.kills = 3;
+        Game.gameTime = 20;
+        Player.hp = 0;
+        Game.gameOver();
+        await sleep(100);
+        UI.hideGameOver();
+        Game.showResults();
+        await sleep(200);
+        
+        assert(Game.state === 'RESULTS', `In RESULTS before restart (got: ${Game.state})`);
+        
+        // Click "Yeniden Oyna"
+        UI.hideResults();
+        Game.resetAndStart();
+        await sleep(200);
+        
+        assert(Game.state === 'PLAYING', `Restarted to PLAYING (got: ${Game.state})`);
+        assert(Game.kills === 0, `Kills reset to 0 (got: ${Game.kills})`);
+        assert(Game.gameTime === 0, `Time reset to 0 (got: ${Game.gameTime})`);
+        assert(Player.hp > 0, `Player HP restored (got: ${Player.hp})`);
+        
+        // Now return to menu from pause
+        Game.pauseGame();
+        Game.returnToMenu();
+        await sleep(200);
+        
+        assert(Game.state === 'MENU', `Back to MENU after restart+pause (got: ${Game.state})`);
+        assert(hasClass('menu-screen', 'visible'), 'Menu visible after restart cycle');
+    } catch(e) { log(`  ⚠ RESTART ERROR: ${e.message}`, 'fail'); }
+
+    // ── TEST 6: Economy & Collection ──
+    log('\n── TEST 6: Economy & Collection ──');
+    try {
+        assert(typeof Economy.gold === 'number', 'Economy.gold is a number');
+        assert(typeof Economy.totalGold === 'number', 'Economy.totalGold is a number');
+        assert(typeof Economy.getMetaSummary === 'function', 'getMetaSummary exists');
+        assert(typeof Economy.recordEnemyKill === 'function', 'recordEnemyKill exists');
+        assert(typeof Economy.getCollectionSummary === 'function', 'getCollectionSummary exists');
+        
+        const meta = Economy.getMetaSummary();
+        assert(typeof meta === 'object', 'getMetaSummary returns object');
+        assert(meta.hasOwnProperty('achievementsText'), 'Meta has achievementsText');
+        assert(meta.hasOwnProperty('statsText'), 'Meta has statsText');
+        assert(meta.hasOwnProperty('collectionText'), 'Meta has collectionText');
+    } catch(e) { log(`  ⚠ ECONOMY ERROR: ${e.message}`, 'fail'); }
+
+    // ── TEST 7: UI Accessibility ──
+    log('\n── TEST 7: Accessibility System ──');
+    try {
+        assert(typeof UI._access === 'object', 'UI._access object exists');
+        assert(typeof UI._loadAccessibility === 'function', '_loadAccessibility exists');
+        assert(typeof UI._saveAccessibility === 'function', '_saveAccessibility exists');
+        assert(typeof UI._applyAccessibility === 'function', '_applyAccessibility exists');
+    } catch(e) { log(`  ⚠ ACCESS ERROR: ${e.message}`, 'fail'); }
+
+    // ── TEST 8: Run Modifiers ──
+    log('\n── TEST 8: Run Modifier System ──');
+    try {
+        assert(typeof Economy.startRunWithModifier === 'function', 'startRunWithModifier exists');
+        assert(typeof Economy.activeModifier !== 'undefined', 'activeModifier is defined');
+        const modText = Economy.getMetaSummary().modifierText;
+        assert(typeof modText === 'string' && modText.length > 0, `Modifier text present (${modText.substring(0,40)}...)`);
+    } catch(e) { log(`  ⚠ MODIFIER ERROR: ${e.message}`, 'fail'); }
+
+    // ── TEST 9: Tutorial System ──
+    log('\n── TEST 9: Tutorial System ──');
+    try {
+        assert(typeof UI.startTutorial === 'function', 'startTutorial exists');
+        assert(typeof UI._updateTutorial === 'function', '_updateTutorial exists');
+    } catch(e) { log(`  ⚠ TUTORIAL ERROR: ${e.message}`, 'fail'); }
+
+    // ── TEST 10: PWA / Service Worker ──
+    log('\n── TEST 10: PWA Manifest ──');
+    try {
+        const resp = await fetch('/manifest.json');
+        assert(resp.ok, 'manifest.json is fetchable');
+        const manifest = await resp.json();
+        assert(manifest.name && manifest.name.length > 0, `Manifest has name: "${manifest.name}"`);
+        assert(manifest.start_url, `Manifest has start_url: "${manifest.start_url}"`);
+        assert(manifest.display === 'standalone', 'Manifest display is standalone');
+    } catch(e) { log(`  ⚠ PWA ERROR: ${e.message}`, 'fail'); }
+
+    // ── SUMMARY ──
+    log('\n═══════════════════════════════════════');
+    log(`  TOPLAM: ${passCount + failCount} test`);
+    log(`  ✅ GEÇEN: ${passCount}`, 'pass');
+    if (failCount > 0) {
+        log(`  ❌ KALAN: ${failCount}`, 'fail');
+    } else {
+        log(`  🎉 TÜM TESTLER GEÇTİ!`, 'pass');
+    }
+    log('═══════════════════════════════════════');
+}
+
+window.addEventListener('load', () => {
+    setTimeout(runTests, 1000);
+});
+</script>
+</body>
+</html>
