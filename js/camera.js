@@ -59,9 +59,11 @@ const Camera = {
      */
     applyTransform(ctx, canvas) {
         ctx.save();
+        const cw = canvas.clientWidth || canvas.width;
+        const ch = canvas.clientHeight || canvas.height;
         ctx.translate(
-            canvas.width / 2 - this.x + this.shakeX,
-            canvas.height / 2 - this.y + this.shakeY
+            cw / 2 - this.x + this.shakeX,
+            ch / 2 - this.y + this.shakeY
         );
     },
 
@@ -77,9 +79,11 @@ const Camera = {
      * Convert world coordinates to screen coordinates
      */
     worldToScreen(wx, wy, canvas) {
+        const cw = canvas.clientWidth || canvas.width;
+        const ch = canvas.clientHeight || canvas.height;
         return {
-            x: wx - this.x + canvas.width / 2 + this.shakeX,
-            y: wy - this.y + canvas.height / 2 + this.shakeY
+            x: wx - this.x + cw / 2 + this.shakeX,
+            y: wy - this.y + ch / 2 + this.shakeY
         };
     },
 
@@ -87,9 +91,11 @@ const Camera = {
      * Convert screen coordinates to world coordinates
      */
     screenToWorld(sx, sy, canvas) {
+        const cw = canvas.clientWidth || canvas.width;
+        const ch = canvas.clientHeight || canvas.height;
         return {
-            x: sx + this.x - canvas.width / 2 - this.shakeX,
-            y: sy + this.y - canvas.height / 2 - this.shakeY
+            x: sx + this.x - cw / 2 - this.shakeX,
+            y: sy + this.y - ch / 2 - this.shakeY
         };
     },
 
@@ -97,9 +103,11 @@ const Camera = {
      * Check if a world position is visible on screen (with margin)
      */
     isVisible(wx, wy, margin, canvas) {
-        const sx = wx - this.x + canvas.width / 2;
-        const sy = wy - this.y + canvas.height / 2;
-        return sx > -margin && sx < canvas.width + margin &&
-            sy > -margin && sy < canvas.height + margin;
+        const cw = canvas.clientWidth || canvas.width;
+        const ch = canvas.clientHeight || canvas.height;
+        const sx = wx - this.x + cw / 2;
+        const sy = wy - this.y + ch / 2;
+        return sx > -margin && sx < cw + margin &&
+            sy > -margin && sy < ch + margin;
     }
 };
