@@ -594,6 +594,13 @@ const Enemies = {
         this._ensureBulletImpactPool();
     },
 
+    clear() {
+        if (this.pool) this.pool.releaseAll();
+        this._clearBulletImpactPool();
+        this.bullets = [];
+        this.activeBoss = null;
+    },
+
     _rebuildSpatialIndex() {
         if (!this._spatialMap) this._spatialMap = new Map();
         this._spatialMap.clear();

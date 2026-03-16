@@ -158,6 +158,9 @@ const Game = {
             if (this.state === 'PLAYING') {
                 this.gameTime += scaledDt;
                 this.update(scaledDt);
+            } else if (this.state === 'LEVELUP') {
+                // Keep LevelSystem transition timers running even while choosing a card
+                if (typeof LevelSystem !== 'undefined') LevelSystem.update(scaledDt);
             }
 
             // ======= RENDER =======

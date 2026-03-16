@@ -867,11 +867,19 @@ const Characters = {
         ctx.translate(Player.x, Player.y + hoverOffset);
         ctx.rotate(spriteRotation);
 
-        // Subtle neon glow
+        // Subtle neon glow (Drawn separately to fix iOS Canvas drawImage + shadowBlur bug)
         const glowColor = char ? char.color : '#00ffff';
+        ctx.save();
         ctx.shadowColor = glowColor;
         ctx.shadowBlur = 15 + Math.sin(this._hoverTime * 5) * 5;
+        ctx.beginPath();
+        ctx.arc(0, 0, Player.radius * 0.8, 0, Math.PI * 2);
+        ctx.fillStyle = glowColor;
+        ctx.globalAlpha = 0.25;
+        ctx.fill();
+        ctx.restore();
 
+        // Draw actual sprite without shadow
         ctx.drawImage(
             sprite.img,
             -drawSize / 2,
@@ -880,7 +888,6 @@ const Characters = {
             drawSize
         );
 
-        ctx.shadowBlur = 0;
         ctx.restore();
 
         ctx.globalAlpha = 1;
