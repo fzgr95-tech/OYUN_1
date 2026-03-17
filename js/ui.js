@@ -154,49 +154,54 @@ const UI = {
             }
         }
 
+        // Helper function for safe event binding
+        const safeOn = (el, event, handler) => {
+            if (el) el.addEventListener(event, handler);
+            else console.warn('[UI] Element not found for event binding');
+        };
+
         // Menu start button → start game immediately
-        if (this.els.startBtn) {
-        this.els.startBtn.addEventListener('click', () => {
+        safeOn(this.els.startBtn, 'click', () => {
+            console.log('[UI] Start button clicked!');
             Audio.init();
             Audio.resume();
             Game.startGame();
         });
-        }
 
         // Character select buttons
-        this.els.charStartBtn.addEventListener('click', () => {
+        safeOn(this.els.charStartBtn, 'click', () => {
             this.hideCharSelect();
             this.showMapSelect();
         });
 
-        this.els.charBackBtn.addEventListener('click', () => {
+        safeOn(this.els.charBackBtn, 'click', () => {
             this.hideCharSelect();
             this.showMenu();
         });
 
         // Map select buttons
-        this.els.mapStartBtn.addEventListener('click', () => {
+        safeOn(this.els.mapStartBtn, 'click', () => {
             const selectedMap = Maps.getSelected();
             if (!selectedMap) return;
             Game.startGame();
         });
 
-        this.els.mapBackBtn.addEventListener('click', () => {
+        safeOn(this.els.mapBackBtn, 'click', () => {
             this.hideMapSelect();
             this.showCharSelect();
         });
 
         // Quest panel buttons
-        this.els.questBtn.addEventListener('click', () => {
+        safeOn(this.els.questBtn, 'click', () => {
             this.showQuestPanel();
         });
 
-        this.els.questPanelClose.addEventListener('click', () => {
+        safeOn(this.els.questPanelClose, 'click', () => {
             this.hideQuestPanel();
         });
 
         // Game over buttons
-        this.els.goReviveBtn.addEventListener('click', () => {
+        safeOn(this.els.goReviveBtn, 'click', () => {
             if (Economy.reviveUsed) return;
             Economy.reviveUsed = true;
             Player.revive(0.5);
@@ -204,127 +209,107 @@ const UI = {
             Game.resumeFromRevive();
         });
 
-        this.els.goEndBtn.addEventListener('click', () => {
+        safeOn(this.els.goEndBtn, 'click', () => {
             this.hideGameOver();
             Game.showResults();
         });
 
         // Results buttons
-        this.els.doubleGoldBtn.addEventListener('click', () => {
+        safeOn(this.els.doubleGoldBtn, 'click', () => {
             Economy.doubleGold();
             this.els.resultGold.textContent = Economy.formatGold(Economy.gold);
             this.els.resultTotalGold.textContent = Economy.formatGold(Economy.totalGold);
             this.els.doubleGoldBtn.style.display = 'none';
         });
 
-        this.els.resultRestartBtn.addEventListener('click', () => {
+        safeOn(this.els.resultRestartBtn, 'click', () => {
             this.hideResults();
             Game.resetAndStart();
         });
 
-        this.els.resultMenuBtn.addEventListener('click', () => {
+        safeOn(this.els.resultMenuBtn, 'click', () => {
             Game.returnToMenu();
         });
 
         // Mute toggle
-        this.els.muteBtn.addEventListener('click', () => {
+        safeOn(this.els.muteBtn, 'click', () => {
             Audio.toggleMute();
             this.els.muteBtn.textContent = Audio.muted ? '🔇' : '🔊';
         });
 
         // Shop buttons
-        this.els.shopBtn.addEventListener('click', () => {
+        safeOn(this.els.shopBtn, 'click', () => {
             Audio.init();
             Audio.resume();
             this.hideMenu();
             this.showShop();
         });
 
-        this.els.shopBackBtn.addEventListener('click', () => {
+        safeOn(this.els.shopBackBtn, 'click', () => {
             this.hideShop();
             this.showMenu();
         });
 
-        if (this.els.shopTabUpgrades) {
-            this.els.shopTabUpgrades.addEventListener('click', () => this.showShopTab('upgrades'));
-        }
-        if (this.els.shopTabCharacters) {
-            this.els.shopTabCharacters.addEventListener('click', () => this.showShopTab('characters'));
-        }
-        if (this.els.shopTabMaps) {
-            this.els.shopTabMaps.addEventListener('click', () => this.showShopTab('maps'));
-        }
+        safeOn(this.els.shopTabUpgrades, 'click', () => this.showShopTab('upgrades'));
+        safeOn(this.els.shopTabCharacters, 'click', () => this.showShopTab('characters'));
+        safeOn(this.els.shopTabMaps, 'click', () => this.showShopTab('maps'));
 
         // Pause buttons
-        if (this.els.dashBtn) {
-            this.els.dashBtn.addEventListener('click', () => {
-                if (typeof Input !== 'undefined' && Input.requestDash) {
-                    Input.requestDash();
-                }
-            });
-        }
+        safeOn(this.els.dashBtn, 'click', () => {
+            if (typeof Input !== 'undefined' && Input.requestDash) {
+                Input.requestDash();
+            }
+        });
 
-        this.els.pauseBtn.addEventListener('click', () => {
+        safeOn(this.els.pauseBtn, 'click', () => {
             Game.pauseGame();
         });
 
-        this.els.resumeBtn.addEventListener('click', () => {
+        safeOn(this.els.resumeBtn, 'click', () => {
             Game.resumeGame();
         });
 
-        this.els.pauseMenuBtn.addEventListener('click', () => {
+        safeOn(this.els.pauseMenuBtn, 'click', () => {
             Game.returnToMenu();
         });
 
-        if (this.els.qualityToggleBtn) {
-            this.els.qualityToggleBtn.addEventListener('click', () => {
-                if (typeof Renderer === 'undefined' || !Renderer.toggleQualityPreset) return;
-                Renderer.toggleQualityPreset();
-                this._syncPostFXButtons();
-            });
-        }
+        safeOn(this.els.qualityToggleBtn, 'click', () => {
+            if (typeof Renderer === 'undefined' || !Renderer.toggleQualityPreset) return;
+            Renderer.toggleQualityPreset();
+            this._syncPostFXButtons();
+        });
 
-        if (this.els.bloomToggleBtn) {
-            this.els.bloomToggleBtn.addEventListener('click', () => {
-                if (typeof Renderer === 'undefined') return;
-                Renderer.setBloomEnabled(!Renderer.bloomEnabled);
-                this._syncPostFXButtons();
-            });
-        }
+        safeOn(this.els.bloomToggleBtn, 'click', () => {
+            if (typeof Renderer === 'undefined') return;
+            Renderer.setBloomEnabled(!Renderer.bloomEnabled);
+            this._syncPostFXButtons();
+        });
 
-        if (this.els.crtToggleBtn) {
-            this.els.crtToggleBtn.addEventListener('click', () => {
-                if (typeof Renderer === 'undefined') return;
-                Renderer.setCRTEnabled(!Renderer.crtEnabled);
-                this._syncPostFXButtons();
-            });
-        }
+        safeOn(this.els.crtToggleBtn, 'click', () => {
+            if (typeof Renderer === 'undefined') return;
+            Renderer.setCRTEnabled(!Renderer.crtEnabled);
+            this._syncPostFXButtons();
+        });
 
-        if (this.els.chromaticToggleBtn) {
-            this.els.chromaticToggleBtn.addEventListener('click', () => {
-                if (typeof Renderer === 'undefined') return;
-                Renderer.setChromaticEnabled(!Renderer.chromaticEnabled);
-                this._syncPostFXButtons();
-            });
-        }
+        safeOn(this.els.chromaticToggleBtn, 'click', () => {
+            if (typeof Renderer === 'undefined') return;
+            Renderer.setChromaticEnabled(!Renderer.chromaticEnabled);
+            this._syncPostFXButtons();
+        });
 
-        if (this.els.contrastToggleBtn) {
-            this.els.contrastToggleBtn.addEventListener('click', () => {
-                this._access.highContrast = !this._access.highContrast;
-                this._applyAccessibility();
-                this._saveAccessibility();
-                this._syncPostFXButtons();
-            });
-        }
+        safeOn(this.els.contrastToggleBtn, 'click', () => {
+            this._access.highContrast = !this._access.highContrast;
+            this._applyAccessibility();
+            this._saveAccessibility();
+            this._syncPostFXButtons();
+        });
 
-        if (this.els.hudsizeToggleBtn) {
-            this.els.hudsizeToggleBtn.addEventListener('click', () => {
-                this._access.hudLarge = !this._access.hudLarge;
-                this._applyAccessibility();
-                this._saveAccessibility();
-                this._syncPostFXButtons();
-            });
-        }
+        safeOn(this.els.hudsizeToggleBtn, 'click', () => {
+            this._access.hudLarge = !this._access.hudLarge;
+            this._applyAccessibility();
+            this._saveAccessibility();
+            this._syncPostFXButtons();
+        });
 
         this._loadAccessibility();
         this._applyAccessibility();
