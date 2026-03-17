@@ -8,6 +8,12 @@
 (function () {
     'use strict';
 
+    // Safety check - ensure required objects exist
+    if (typeof Player === 'undefined' || !Player.tryDash) {
+        console.error('[game_feel] Player or Player.tryDash not found! Skipping game_feel enhancements.');
+        return;
+    }
+
     // ════════════════════════════════════════════════════════
     // 1. DASH TRAIL — Afterimage ghost when player dashes
     // ════════════════════════════════════════════════════════

@@ -43,6 +43,7 @@ const UI = {
     },
 
     init() {
+        try {
         this.els = {
             hud: document.getElementById('hud'),
             hpBar: document.getElementById('hp-bar-fill'),
@@ -68,8 +69,6 @@ const UI = {
             startBtn: document.getElementById('start-btn'),
             menuGoldText: document.getElementById('menu-gold'),
             menuHighScoreText: document.getElementById('menu-highscore'),
-            devModeBtn: document.getElementById('dev-mode-btn'),
-            devModeText: document.getElementById('dev-mode-text'),
 
             // Game Over
             goReviveBtn: document.getElementById('go-revive-btn'),
@@ -147,28 +146,22 @@ const UI = {
             questPanelClose: document.getElementById('quest-panel-close')
         };
 
-        // Initial Dev Mode State
-        this._updateDevModeUI();
-
-        if (this.els.devModeBtn) {
-            this.els.devModeBtn.addEventListener('click', () => {
-                const current = localStorage.getItem('neonhorde_dev_mode') === 'true';
-                localStorage.setItem('neonhorde_dev_mode', (!current).toString());
-                this._updateDevModeUI();
-                Audio.playSelect();
-                // Optionally refresh shop if open
-                if (this.els.shopScreen.classList.contains('visible')) {
-                    this._updateShopUI();
-                }
-            });
+        // Check critical elements
+        const criticalEls = ['startBtn', 'menuScreen', 'charStartBtn', 'charBackBtn', 'mapStartBtn', 'mapBackBtn'];
+        for (const name of criticalEls) {
+            if (!this.els[name]) {
+                console.error('[UI] Critical element missing: ' + name);
+            }
         }
 
         // Menu start button → start game immediately
+        if (this.els.startBtn) {
         this.els.startBtn.addEventListener('click', () => {
             Audio.init();
             Audio.resume();
             Game.startGame();
         });
+        }
 
         // Character select buttons
         this.els.charStartBtn.addEventListener('click', () => {
@@ -337,27 +330,11 @@ const UI = {
         this._applyAccessibility();
         this._syncPostFXButtons();
         this._tutorialCompleted = this._isTutorialDone();
-    },
-
-    _updateDevModeUI() {
-        if (!this.els.devModeBtn || !this.els.devModeText) return;
-        
-        const isDev = this.isDevMode();
-        if (isDev) {
-            this.els.devModeText.textContent = '🛠️ GELİŞTİRİCİ MODU: AÇIK';
-            this.els.devModeBtn.style.borderColor = '#00ff88';
-            this.els.devModeBtn.style.color = '#00ff88';
-            this.els.devModeBtn.style.textShadow = '0 0 8px rgba(0,255,136,0.6)';
-        } else {
-            this.els.devModeText.textContent = '🛠️ GELİŞTİRİCİ MODU: KAPALI';
-            this.els.devModeBtn.style.borderColor = '#ff00ff';
-            this.els.devModeBtn.style.color = '#ff00ff';
-            this.els.devModeBtn.style.textShadow = '0 0 8px rgba(255,0,255,0.6)';
+        console.log('[UI] init completed successfully');
+        } catch (e) {
+            console.error('[UI] init FAILED:', e);
+            alert('UI başlatma hatası: ' + e.message + '\n\nLütfen F12 basıp Console sekmesine bakın.');
         }
-    },
-
-    isDevMode() {
-        return localStorage.getItem('neonhorde_dev_mode') === 'true';
     },
 
     _loadAccessibility() {

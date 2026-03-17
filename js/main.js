@@ -24,6 +24,8 @@ const Game = {
      * Initialize everything
      */
     init() {
+        try {
+        console.log('[Game] Starting init...');
         this.canvas = document.getElementById('game-canvas');
         Renderer.init(this.canvas);
         Input.init(this.canvas);
@@ -45,6 +47,11 @@ const Game = {
         // Start the render loop (always runs for background animation)
         this.lastTime = performance.now();
         requestAnimationFrame((t) => this.loop(t));
+        console.log('[Game] Init completed successfully');
+        } catch (e) {
+            console.error('[Game] Init FAILED:', e);
+            alert('Oyun başlatılamadı: ' + e.message + '\n\nF12 basıp Console sekmesine bakın.');
+        }
     },
 
     /**
@@ -158,9 +165,6 @@ const Game = {
             if (this.state === 'PLAYING') {
                 this.gameTime += scaledDt;
                 this.update(scaledDt);
-            } else if (this.state === 'LEVELUP') {
-                // Keep LevelSystem transition timers running even while choosing a card
-                if (typeof LevelSystem !== 'undefined') LevelSystem.update(scaledDt);
             }
 
             // ======= RENDER =======

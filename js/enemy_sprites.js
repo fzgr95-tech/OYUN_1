@@ -3,24 +3,8 @@
 // ============================================================
 // This file is loaded AFTER enemy.js and extends the Enemies
 // object with sprite/asset methods using Object.assign.
+// SpriteSheet class is already defined in enemy.js — do not redeclare!
 // ============================================================
-
-class SpriteSheet {
-    constructor(image, frameWidth, frameHeight, frameCount) {
-        this.image = image;
-        this.frameWidth = frameWidth;
-        this.frameHeight = frameHeight;
-        this.frameCount = frameCount;
-        this.cols = Math.max(1, Math.floor(image.width / frameWidth));
-    }
-
-    getSourceRect(frameIndex) {
-        const idx = ((frameIndex % this.frameCount) + this.frameCount) % this.frameCount;
-        const sourceX = (idx % this.cols) * this.frameWidth;
-        const sourceY = Math.floor(idx / this.cols) * this.frameHeight;
-        return { sourceX, sourceY, sourceWidth: this.frameWidth, sourceHeight: this.frameHeight };
-    }
-}
 
 Object.assign(Enemies, {
     // Sprite state properties
