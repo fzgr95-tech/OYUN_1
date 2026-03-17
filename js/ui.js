@@ -68,6 +68,8 @@ const UI = {
             startBtn: document.getElementById('start-btn'),
             menuGoldText: document.getElementById('menu-gold'),
             menuHighScoreText: document.getElementById('menu-highscore'),
+            devModeBtn: document.getElementById('dev-mode-btn'),
+            devModeText: document.getElementById('dev-mode-text'),
 
             // Game Over
             goReviveBtn: document.getElementById('go-revive-btn'),
@@ -144,6 +146,22 @@ const UI = {
             questPanelBody: document.getElementById('quest-panel-body'),
             questPanelClose: document.getElementById('quest-panel-close')
         };
+
+        // Initial Dev Mode State
+        this._updateDevModeUI();
+
+        if (this.els.devModeBtn) {
+            this.els.devModeBtn.addEventListener('click', () => {
+                const current = localStorage.getItem('neonhorde_dev_mode') === 'true';
+                localStorage.setItem('neonhorde_dev_mode', (!current).toString());
+                this._updateDevModeUI();
+                Audio.playSelect();
+                // Optionally refresh shop if open
+                if (this.els.shopScreen.classList.contains('visible')) {
+                    this._updateShopUI();
+                }
+            });
+        }
 
         // Menu start button → start game immediately
         this.els.startBtn.addEventListener('click', () => {
@@ -319,6 +337,27 @@ const UI = {
         this._applyAccessibility();
         this._syncPostFXButtons();
         this._tutorialCompleted = this._isTutorialDone();
+    },
+
+    _updateDevModeUI() {
+        if (!this.els.devModeBtn || !this.els.devModeText) return;
+        
+        const isDev = this.isDevMode();
+        if (isDev) {
+            this.els.devModeText.textContent = '🛠️ GELİŞTİRİCİ MODU: AÇIK';
+            this.els.devModeBtn.style.borderColor = '#00ff88';
+            this.els.devModeBtn.style.color = '#00ff88';
+            this.els.devModeBtn.style.textShadow = '0 0 8px rgba(0,255,136,0.6)';
+        } else {
+            this.els.devModeText.textContent = '🛠️ GELİŞTİRİCİ MODU: KAPALI';
+            this.els.devModeBtn.style.borderColor = '#ff00ff';
+            this.els.devModeBtn.style.color = '#ff00ff';
+            this.els.devModeBtn.style.textShadow = '0 0 8px rgba(255,0,255,0.6)';
+        }
+    },
+
+    isDevMode() {
+        return localStorage.getItem('neonhorde_dev_mode') === 'true';
     },
 
     _loadAccessibility() {
