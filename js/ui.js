@@ -37,6 +37,8 @@ const UI = {
     _fpsHudLastSampleTime: 0,
     TUTORIAL_STORAGE_KEY: 'neonhorde_tutorial_done',
     ACCESS_STORAGE_KEY: 'neonhorde_access_settings',
+    DEV_MODE_KEY: 'neonhorde_dev_mode',
+    _devMode: false,
     _access: {
         highContrast: false,
         hudLarge: false
@@ -143,7 +145,10 @@ const UI = {
             questBtn: document.getElementById('quest-btn'),
             questPanel: document.getElementById('quest-panel'),
             questPanelBody: document.getElementById('quest-panel-body'),
-            questPanelClose: document.getElementById('quest-panel-close')
+            questPanelClose: document.getElementById('quest-panel-close'),
+
+            // Dev Mode
+            devModeBtn: document.getElementById('dev-mode-btn')
         };
 
         // Check critical elements
@@ -198,6 +203,14 @@ const UI = {
 
         safeOn(this.els.questPanelClose, 'click', () => {
             this.hideQuestPanel();
+        });
+
+        // Dev mode toggle
+        safeOn(this.els.devModeBtn, 'click', () => {
+            this._devMode = !this._devMode;
+            this._updateDevModeBtn();
+            this._saveDevMode();
+            console.log('[UI] Dev mode:', this._devMode ? 'ON' : 'OFF');
         });
 
         // Game over buttons
@@ -311,6 +324,7 @@ const UI = {
             this._syncPostFXButtons();
         });
 
+        this._loadDevMode();
         this._loadAccessibility();
         this._applyAccessibility();
         this._syncPostFXButtons();
@@ -320,6 +334,29 @@ const UI = {
             console.error('[UI] init FAILED:', e);
             alert('UI başlatma hatası: ' + e.message + '\n\nLütfen F12 basıp Console sekmesine bakın.');
         }
+    },
+
+    _updateDevModeBtn() {
+        if (!this.els.devModeBtn) return;
+        const on = this._devMode;
+        this.els.devModeBtn.innerHTML = `<span>🔧 GELİŞTİRİCİ MODU: ${on ? 'AÇIK' : 'KAPALI'}</span>`;
+        this.els.devModeBtn.classList.toggle('active', on);
+    },
+
+    _saveDevMode() {
+        try {
+            localStorage.setItem(this.DEV_MODE_KEY, this._devMode ? '1' : '0');
+        } catch (e) {}
+    },
+
+    _loadDevMode() {
+        try {
+            const val = localStorage.getItem(this.DEV_MODE_KEY);
+            this._devMode = val === '1';
+        } catch (e) {
+            this._devMode = false;
+        }
+        this._updateDevModeBtn();
     },
 
     _loadAccessibility() {
