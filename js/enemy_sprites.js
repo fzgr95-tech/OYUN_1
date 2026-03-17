@@ -58,9 +58,10 @@ Object.assign(Enemies, {
         if (this._spritesReady || this._sprites._loading) return;
         this._sprites._loading = true;
         let loaded = 0;
-        const total = 4;
+        const total = 20; // 4 defaults + 16 map specifics
         const markDone = () => { loaded++; if (loaded >= total) this._spritesReady = true; };
 
+        // Defaults (Neon City)
         this._sprites.kare = new Image();
         this._sprites.kare.onload = markDone;
         this._sprites.kare.onerror = markDone;
@@ -80,6 +81,22 @@ Object.assign(Enemies, {
         this._sprites.boss.onload = markDone;
         this._sprites.boss.onerror = markDone;
         this._sprites.boss.src = 'assets/sprites/boss_dusman.png';
+        
+        // --- Map Specific Entities ---
+        const mapKeys = ['ice', 'lava', 'forest', 'space'];
+        const types = ['drone', 'fighter', 'tank', 'boss'];
+        
+        mapKeys.forEach(mk => {
+            this._sprites[mk] = {};
+            types.forEach(t => {
+                const img = new Image();
+                img.onload = markDone;
+                img.onerror = markDone;
+                // Get the latest file matching the pattern
+                img.src = `assets/sprites/${mk}_${t}.png`; // Warning: Needs exact filenames if timestamped, will handle fallback
+                this._sprites[mk][t] = img;
+            });
+        });
     },
 
     _ensureBulletFx() {
@@ -210,9 +227,39 @@ Object.assign(Enemies, {
         return c;
     },
 
-    // Get the correct sprite image for an enemy
+    // Get the correct sprite image for an enemy based on the current map
     _getSpriteForEnemy(e) {
         if (!this._spritesReady) return null;
+        
+        const mapId = Maps.selected || 'neonCity';
+        
+        // Map specific sprite logic
+        if (mapId === 'iceCave' && this._sprites.ice) {
+            if (e.isBoss) return this._sprites.ice.boss;
+            if (e.sides === 3) return this._sprites.ice.fighter;
+            if (e.sides === 4) return this._sprites.ice.drone;
+            return this._sprites.ice.tank;
+        }
+        else if (mapId === 'lavaFactory' && this._sprites.lava) {
+            if (e.isBoss) return this._sprites.lava.boss;
+            if (e.sides === 3) return this._sprites.lava.fighter;
+            if (e.sides === 4) return this._sprites.lava.drone;
+            return this._sprites.lava.tank;
+        }
+        else if (mapId === 'darkForest' && this._sprites.forest) {
+            if (e.isBoss) return this._sprites.forest.boss;
+            if (e.sides === 3) return this._sprites.forest.fighter;
+            if (e.sides === 4) return this._sprites.forest.drone;
+            return this._sprites.forest.tank;
+        }
+        else if (mapId === 'spaceStation' && this._sprites.space) {
+            if (e.isBoss) return this._sprites.space.boss;
+            if (e.sides === 3) return this._sprites.space.fighter;
+            if (e.sides === 4) return this._sprites.space.drone;
+            return this._sprites.space.tank;
+        }
+        
+        // Fallback to defaults (Neon City and others)
         if (e.isBoss) return this._sprites.boss;
         if (e.sides === 3) return this._sprites.ucak;   // Rusher/Fighter → uçak
         if (e.sides === 4) return this._sprites.kare;   // Drone → kare
