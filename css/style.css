@@ -2107,4 +2107,48 @@ body.hud-large #xp-text {
     #landscape-warning {
         display: flex;
     }
+}
+
+/* ============================================================
+   Mobile layout tweaks for Main Menu
+   ============================================================ */
+@media screen and (max-width: 600px), screen and (max-height: 800px) {
+    .menu-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+        padding: 5px;
+    }
+
+    .game-title {
+        font-size: 38px;
+        margin-top: 10px;
+        line-height: 1.2;
+    }
+
+    .game-subtitle {
+        font-size: 14px;
+        letter-spacing: 12px;
+        margin-bottom: 20px;
+    }
+
+    .menu-stats {
+        margin-bottom: 20px;
+        gap: 15px;
+    }
+
+    #start-btn {
+        padding: 12px 30px;
+        font-size: 18px;
+    }
+
+    /* Shrink the developer mode button specifically */
+    #dev-mode-btn {
+        margin-top: 10px !important;
+        padding: 8px 16px !important;
+        font-size: 11px !important;
+    }
 }
