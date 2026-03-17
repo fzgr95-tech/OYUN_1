@@ -177,12 +177,9 @@ const Economy = {
         this.unlocks.weapons = { ...defaultWeapons, ...this.unlocks.weapons };
     },
 
-    _isDevMode() {
-        return localStorage.getItem('neonhorde_dev_mode') === 'true';
-    },
-
     isCharacterUnlocked(id) {
-        if (this._isDevMode()) return true;
+        // Dev mode: all characters unlocked
+        if (typeof UI !== 'undefined' && UI._devMode) return true;
         if (id === 'cipher') return true;
         return !!this.unlocks.characters[id];
     },
@@ -201,7 +198,8 @@ const Economy = {
     // ---- MAP UNLOCKS ----
 
     isMapUnlocked(mapId) {
-        if (this._isDevMode()) return true;
+        // Dev mode: all maps unlocked
+        if (typeof UI !== 'undefined' && UI._devMode) return true;
         if (mapId === 'neonCity') return true; // Neon Şehir her zaman açık
         return !!this.unlocks.maps[mapId];
     },
@@ -258,7 +256,8 @@ const Economy = {
     },
 
     isWeaponUnlocked(id) {
-        if (this._isDevMode()) return true;
+        // Dev mode: all weapons unlocked
+        if (typeof UI !== 'undefined' && UI._devMode) return true;
         return !!this.unlocks.weapons[id];
     },
 
