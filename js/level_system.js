@@ -13,7 +13,7 @@ const LevelSystem = {
     active: false,
     levelComplete: false,
     _transitionTimer: 0,
-    _transitionDuration: 2.5,   // Seviye arası bekleme süresi (saniye)
+    _transitionDuration: 0,   // Anında geçiş
     _levelRewardGold: 0,
 
     // ---- Boss milestones ----
@@ -183,8 +183,8 @@ const LevelSystem = {
             Economy.addGold(this._levelRewardGold);
         }
 
-        // Seviye tamamlanma UI göster
-        this._showLevelCompleteUI();
+        // Seviye tamamlanma UI'sini gösterme — anında geçiş
+        // this._showLevelCompleteUI();
         this._updateHUD();
 
         // Ses efekti
